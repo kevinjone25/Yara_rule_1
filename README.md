@@ -43,9 +43,37 @@ yara jpeg.yara ./yara_example
 yara png.yara ./yara_example
 ```
 
-## If Png Header broken
+## If Png broken
 
-It start with ```89 50 4e 47 0d 0a 1a 0a```
+- It Header start with ```89 50 4e 47 0d 0a 1a 0a```
+- IHDR chunk ```49 48 44 52```
+- If IHDR height and width is incorrect(CRC incorrect 
+- brute force it width and height
+- you may use ```pngcheck``` first
+- after it produce , fill it after IHDR chunk
+```
+import os
+import binascii
+import struct
+
+misc = open("broken.png","rb").read()
+
+for i in range(The file size really upper bound):
+    for j in range(The file size really upper bound):
+        data = misc[12:16] + struct.pack('>i',i) + struct.pack('>i', j) + misc[24:29]
+        crc32 = binascii.crc32(data) & 0xffffffff
+        if crc32 == 0xF8FFF17E:
+            print(hex(i))
+            print(hex(j))
+```
+
+ref :
+<div>
+<a href="https://ctf-wiki.mahaloz.re/misc/picture/png/">ctf-wiki</a>
+  </div>
+  <div>
+<a href="https://github.com/VirusTotal/yara/releases">png signature</a>
+</div>
 
 ## JPEG size
 
